@@ -106,4 +106,3 @@ for id, site in sites:
         transaction.commit()
 
 print 'End analysis'
-sys.exit(0)
