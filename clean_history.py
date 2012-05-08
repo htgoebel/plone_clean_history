@@ -2,6 +2,7 @@
 
 import sys
 import optparse
+
 import transaction
 
 from ZODB.POSException import ConflictError
@@ -58,10 +59,13 @@ def spoofRequest(app):
 # Enable Faux HTTP request object
 app = spoofRequest(app)
 
-sites = [(id, site) for (id, site) in app.items() if hasattr(site, 'meta_type') and site.meta_type=='Plone Site']
+sites = [(id, site)
+         for (id, site) in app.items()
+         if getattr(site, 'meta_type', None) == 'Plone Site']
 
-print 'Starting analysis for %s. Types to cleanup: %s' % (not psite and 'all sites' or ', '.join(psite),
-                                                          not pp_type and 'all' or ', '.join(pp_type))
+print 'Starting analysis for %s.'  % (not psite and 'all sites' or ', '.join(psite))
+print 'Types to cleanup: %s' % (not pp_type and 'all' or ', '.join(pp_type))
+
 for id, site in sites:
     if not psite or id in psite:
         print "Analyzing %s" % id
