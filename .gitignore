@@ -1,0 +1,12 @@
+*~
+.\#*
+\#*#
+*.py[co]
+/*.egg
+/*.egg-info
+/*.egg-link
+/build
+/dist
+/.sconsign.dblite
+
+/goecon/theme/refresh.txt
