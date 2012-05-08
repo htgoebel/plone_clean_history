@@ -38,8 +38,7 @@ def spoofRequest(app):
     return makerequest(app)
 
 
-def purge_history(id, site, portal_types_to_purge=[], maxNumberOfVersionsToKeep=None, verbose=False):
-    print "Analyzing", str(id)
+def purge_history(site, portal_types_to_purge=[], maxNumberOfVersionsToKeep=None, verbose=False):
     policy = site.portal_purgepolicy
     portal_repository = site.portal_repository
     if policy.maxNumberOfVersionsToKeep==-1 and not maxNumberOfVersionsToKeep:
@@ -92,7 +91,8 @@ def main(site_ids, portal_types_to_purge, maxNumberOfVersionsToKeep,
 
     for id, site in sites:
         if not site_ids or id in site_ids:
-            purge_history(id, site, portal_types_to_purge,
+            print "Analyzing", str(id)
+            purge_history(site, portal_types_to_purge,
                           maxNumberOfVersionsToKeep, verbose)
 
     print 'End analysis'
