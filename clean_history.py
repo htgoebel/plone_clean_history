@@ -51,11 +51,10 @@ def purge_history(site, portal_types_to_purge=[], maxNumberOfVersionsToKeep=None
         print old_maxNumberOfVersionsToKeep, "to", maxNumberOfVersionsToKeep
         policy.maxNumberOfVersionsToKeep = maxNumberOfVersionsToKeep
 
-    catalog = site.portal_catalog
     if portal_types_to_purge:
-        results = catalog(portal_type=portal_types_to_purge)
+        results = site.portal_catalog(portal_type=portal_types_to_purge)
     else:
-        results = catalog()
+        results = site.portal_catalog()
     for x in results:
         try:
             obj = x.getObject()
