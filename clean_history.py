@@ -19,14 +19,14 @@ usage = "usage: /your/instance run clean_history.py [options] [sites]"
 description = "Cleanup CMFEdition history in Plone sites. Default is: all sites in the database."
 p = optparse.OptionParser(usage=usage, version="%prog " + version, description=description,
                           prog="clean_history")
-p.add_option('--portal-type', '-p', dest="portal_types", default=[], action="append", metavar="PORTAL_TYPE",
+p.add_option('--portal-types', '-p', action="append",
              help="select to cleanup only histories for a kind of portal_type. Default is \"all types\". "
                   "Can be called multiple times.")
-p.add_option('--keep-history', '-k', type="int", dest="keep_history", default=0, metavar="HISTORY_SIZE",
+p.add_option('--keep-history', '-k', type="int", metavar="HISTORY_SIZE",
              help='Before purging, temporary set the value of "maximum number of versions to keep in the storage" to this '
                   'value in the portal_purgehistory. Default is: do not change the value. In any case, the original value '
                   'will be restored.')
-p.add_option('--verbose', '-v', action="store_true", default=False,
+p.add_option('--verbose', '-v', action="store_true",
              help="Show verbose output, for every cleaned content's history.")
 
 args = sys.argv[1:]
