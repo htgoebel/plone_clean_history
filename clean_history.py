@@ -82,12 +82,12 @@ def purge_history(id, site, maxNumberOfVersionsToKeep=None, verbose=False):
             print "... cleaning history for %s (%s)" % (x.getPath(), x.portal_type)
         try:
             obj = x.getObject()
-            isVersionable = portal_repository.isVersionable(obj)
-            if isVersionable:
-                obj, history_id = dereference(obj)
-                policy.beforeSaveHook(history_id, obj)
-                if shasattr(obj, 'version_id'):
-                    del obj.version_id
+            if not portal_repository.isVersionable(obj):
+                continue
+            obj, history_id = dereference(obj)
+            policy.beforeSaveHook(history_id, obj)
+            if shasattr(obj, 'version_id'):
+                del obj.version_id
         except ConflictError:
             raise
         except Exception, inst:
