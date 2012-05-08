@@ -56,6 +56,51 @@ def spoofRequest(app):
     newSecurityManager(None, OmnipotentUser().__of__(app.acl_users))
     return makerequest(app)
 
+
+
+def purge_history(id, site, maxNumberOfVersionsToKeep=None, verbose=False):
+    print "Analyzing %s" % id
+    policy = site.portal_purgepolicy
+    portal_repository = site.portal_repository
+    if policy.maxNumberOfVersionsToKeep==-1 and not maxNumberOfVersionsToKeep:
+        print "... maxNumberOfVersionsToKeep is -1; skipping"
+        return
+
+    old_maxNumberOfVersionsToKeep = policy.maxNumberOfVersionsToKeep
+    if maxNumberOfVersionsToKeep:
+        print "... Putting maxNumberOfVersionsToKeep from %d to %s" % (old_maxNumberOfVersionsToKeep,
+                                                                       maxNumberOfVersionsToKeep)
+        policy.maxNumberOfVersionsToKeep = maxNumberOfVersionsToKeep
+
+    catalog = site.portal_catalog
+    if pp_type:
+        results = catalog(portal_type=pp_type)
+    else:
+        results = catalog()
+    for x in results:
+        if verbose:
+            print "... cleaning history for %s (%s)" % (x.getPath(), x.portal_type)
+        try:
+            obj = x.getObject()
+            isVersionable = portal_repository.isVersionable(obj)
+            if isVersionable:
+                obj, history_id = dereference(obj)
+                policy.beforeSaveHook(history_id, obj)
+                if shasattr(obj, 'version_id'):
+                    del obj.version_id
+                if verbose:
+                    print "... cleaned!"
+        except ConflictError:
+            raise
+        except Exception, inst:
+            # sometimes, even with the spoofed request, the getObject failed
+            print "ERROR purging %s (%s)" % (x.getPath(), x.portal_type)
+            print "    %s" % inst
+
+    policy.maxNumberOfVersionsToKeep = old_maxNumberOfVersionsToKeep
+    transaction.commit()
+
+
 # Enable Faux HTTP request object
 app = spoofRequest(app)
 
@@ -68,45 +113,6 @@ print 'Types to cleanup: %s' % (not pp_type and 'all' or ', '.join(pp_type))
 
 for id, site in sites:
     if not psite or id in psite:
-        print "Analyzing %s" % id
-        policy = site.portal_purgepolicy
-        portal_repository = site.portal_repository
-        if policy.maxNumberOfVersionsToKeep==-1 and not options.keep_history:
-            print "... maxNumberOfVersionsToKeep is -1; skipping"
-            continue
-
-        old_maxNumberOfVersionsToKeep = policy.maxNumberOfVersionsToKeep
-        if options.keep_history:
-            print "... Putting maxNumberOfVersionsToKeep from %d to %s" % (old_maxNumberOfVersionsToKeep,
-                                                                           options.keep_history)
-            policy.maxNumberOfVersionsToKeep = options.keep_history
-
-        catalog = site.portal_catalog
-        if pp_type:
-            results = catalog(portal_type=pp_type)
-        else:
-            results = catalog()
-        for x in results:
-            if options.verbose:
-                print "... cleaning history for %s (%s)" % (x.getPath(), x.portal_type)
-            try:
-                obj = x.getObject()
-                isVersionable = portal_repository.isVersionable(obj)
-                if isVersionable:
-                    obj, history_id = dereference(obj)
-                    policy.beforeSaveHook(history_id, obj)
-                    if shasattr(obj, 'version_id'):
-                        del obj.version_id
-                    if options.verbose:
-                        print "... cleaned!" 
-            except ConflictError:
-                raise
-            except Exception, inst:
-                # sometimes, even with the spoofed request, the getObject failed
-                print "ERROR purging %s (%s)" % (x.getPath(), x.portal_type)
-                print "    %s" % inst
-
-        policy.maxNumberOfVersionsToKeep = old_maxNumberOfVersionsToKeep
-        transaction.commit()
+        purge_history(id, site, options.keep_history, options.verbose)
 
 print 'End analysis'
