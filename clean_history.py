@@ -39,7 +39,7 @@ def spoofRequest(app):
 
 
 def purge_history(id, site, portal_types_to_purge=[], maxNumberOfVersionsToKeep=None, verbose=False):
-    print "Analyzing %s" % id
+    print "Analyzing", str(id)
     policy = site.portal_purgepolicy
     portal_repository = site.portal_repository
     if policy.maxNumberOfVersionsToKeep==-1 and not maxNumberOfVersionsToKeep:
@@ -48,8 +48,8 @@ def purge_history(id, site, portal_types_to_purge=[], maxNumberOfVersionsToKeep=
 
     old_maxNumberOfVersionsToKeep = policy.maxNumberOfVersionsToKeep
     if maxNumberOfVersionsToKeep:
-        print "... Putting maxNumberOfVersionsToKeep from %d to %s" % (old_maxNumberOfVersionsToKeep,
-                                                                       maxNumberOfVersionsToKeep)
+        print "... Putting maxNumberOfVersionsToKeep from",
+        print old_maxNumberOfVersionsToKeep, "to", maxNumberOfVersionsToKeep
         policy.maxNumberOfVersionsToKeep = maxNumberOfVersionsToKeep
 
     catalog = site.portal_catalog
@@ -59,7 +59,7 @@ def purge_history(id, site, portal_types_to_purge=[], maxNumberOfVersionsToKeep=
         results = catalog()
     for x in results:
         if verbose:
-            print "... cleaning history for %s (%s)" % (x.getPath(), x.portal_type)
+            print "... cleaning history for", x.getPath(), "(%s)" % x.portal_type
         try:
             obj = x.getObject()
             if not portal_repository.isVersionable(obj):
@@ -72,8 +72,8 @@ def purge_history(id, site, portal_types_to_purge=[], maxNumberOfVersionsToKeep=
             raise
         except Exception, inst:
             # sometimes, even with the spoofed request, the getObject failed
-            print "ERROR purging %s (%s)" % (x.getPath(), x.portal_type)
-            print "    %s" % inst
+            print "ERROR purging", x.getPath(), "(%s)" % x.portal_type
+            print "   ", inst
 
     policy.maxNumberOfVersionsToKeep = old_maxNumberOfVersionsToKeep
     transaction.commit()
@@ -85,8 +85,10 @@ def main(site_ids, portal_types_to_purge, maxNumberOfVersionsToKeep,
              for (id, site) in app.items()
              if getattr(site, 'meta_type', None) == 'Plone Site']
 
-    print 'Starting analysis for %s.'  % (not site_ids and 'all sites' or ', '.join(site_ids))
-    print 'Types to cleanup: %s' % (not portal_types_to_purge and 'all' or ', '.join(portal_types_to_purge))
+    print 'Starting analysis for',
+    print not site_ids and 'all sites' or ', '.join(site_ids)
+    print 'Types to cleanup:',
+    print not portal_types_to_purge and 'all' or ', '.join(portal_types_to_purge)
 
     for id, site in sites:
         if not site_ids or id in site_ids:
