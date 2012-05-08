@@ -46,7 +46,7 @@ def purge_history(site, portal_types_to_purge=[], maxNumberOfVersionsToKeep=None
         return
 
     old_maxNumberOfVersionsToKeep = policy.maxNumberOfVersionsToKeep
-    if maxNumberOfVersionsToKeep:
+    if maxNumberOfVersionsToKeep is not None:
         print "... Putting maxNumberOfVersionsToKeep from",
         print old_maxNumberOfVersionsToKeep, "to", maxNumberOfVersionsToKeep
         policy.maxNumberOfVersionsToKeep = maxNumberOfVersionsToKeep
