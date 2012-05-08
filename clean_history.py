@@ -88,8 +88,6 @@ def purge_history(id, site, maxNumberOfVersionsToKeep=None, verbose=False):
                 policy.beforeSaveHook(history_id, obj)
                 if shasattr(obj, 'version_id'):
                     del obj.version_id
-                if verbose:
-                    print "... cleaned!"
         except ConflictError:
             raise
         except Exception, inst:
