@@ -34,10 +34,9 @@ options, psite = p.parse_args(args)
 pp_type = options.portal_types
 
 try:
-    foo = app
+    app
 except NameError:
-    print p.print_help()
-    sys.exit(1)
+    raise SystemExit(p.get_usage())
 
 def spoofRequest(app):
     """
