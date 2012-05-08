@@ -15,17 +15,23 @@ from Products.CMFCore.tests.base.security import PermissiveSecurityPolicy, Omnip
 from Products.Archetypes.utils import shasattr
 
 version = '0.2'
-usage = "usage: /your/instance run clean_history.py [options] [sites]"
-description = "Cleanup CMFEdition history in Plone sites. Default is: all sites in the database."
-p = optparse.OptionParser(usage=usage, version="%prog " + version, description=description,
+usage = "usage: /your/instance run %prog [options] [sites]"
+description = ("Cleanup CMFEdition history in Plone sites. "
+               "Default is: all sites in the database.")
+
+p = optparse.OptionParser(usage=usage,
+                          version="%prog " + version,
+                          description=description,
                           prog="clean_history")
 p.add_option('--portal-types', '-p', action="append",
-             help="select to cleanup only histories for a kind of portal_type. Default is \"all types\". "
-                  "Can be called multiple times.")
+             help=('select to cleanup only histories for a kind of portal_type. '
+                   'Default is "all types". Can be called multiple times.'))
 p.add_option('--keep-history', '-k', type="int", metavar="HISTORY_SIZE",
-             help='Before purging, temporary set the value of "maximum number of versions to keep in the storage" to this '
-                  'value in the portal_purgehistory. Default is: do not change the value. In any case, the original value '
-                  'will be restored.')
+             help=('Before purging, temporary set the value of "maximum number '
+                   'of versions to keep in the storage" in the '
+                   'portal_purgehistory to this value. '
+                   'Default is: do not change the value. In any case, the '
+                   'original value will be restored.'))
 p.add_option('--verbose', '-v', action="store_true",
              help="Show verbose output, for every cleaned content's history.")
 
