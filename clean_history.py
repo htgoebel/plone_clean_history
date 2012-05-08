@@ -58,12 +58,12 @@ def purge_history(id, site, portal_types_to_purge=[], maxNumberOfVersionsToKeep=
     else:
         results = catalog()
     for x in results:
-        if verbose:
-            print "... cleaning history for", x.getPath(), "(%s)" % x.portal_type
         try:
             obj = x.getObject()
             if not portal_repository.isVersionable(obj):
                 continue
+            if verbose:
+                print "... cleaning history for", x.getPath(), "(%s)" % x.portal_type
             obj, history_id = dereference(obj)
             policy.beforeSaveHook(history_id, obj)
             if shasattr(obj, 'version_id'):
