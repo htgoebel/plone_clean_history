@@ -101,16 +101,22 @@ def purge_history(id, site, maxNumberOfVersionsToKeep=None, verbose=False):
 
 # Enable Faux HTTP request object
 app = spoofRequest(app)
+def main(site_ids, portal_types_to_purge, maxNumberOfVersionsToKeep,
+         verbose):
+    sites = [(id, site)
+             for (id, site) in app.items()
+             if getattr(site, 'meta_type', None) == 'Plone Site']
 
-sites = [(id, site)
-         for (id, site) in app.items()
-         if getattr(site, 'meta_type', None) == 'Plone Site']
+    print 'Starting analysis for %s.'  % (not site_ids and 'all sites' or ', '.join(site_ids))
+    print 'Types to cleanup: %s' % (not portal_types_to_purge and 'all' or ', '.join(portal_types_to_purge))
 
-print 'Starting analysis for %s.'  % (not psite and 'all sites' or ', '.join(psite))
-print 'Types to cleanup: %s' % (not pp_type and 'all' or ', '.join(pp_type))
+    for id, site in sites:
+        if not site_ids or id in site_ids:
+            purge_history(id, site, portal_types_to_purge,
+                          maxNumberOfVersionsToKeep, verbose)
 
-for id, site in sites:
-    if not psite or id in psite:
-        purge_history(id, site, options.keep_history, options.verbose)
+    print 'End analysis'
 
-print 'End analysis'
+
+main(site_ids, options.portal_types, options.keep_history,
+     options.verbose)
