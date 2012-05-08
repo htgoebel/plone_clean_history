@@ -20,30 +20,11 @@ usage = "usage: /your/instance run %prog [options] [sites]"
 description = ("Cleanup CMFEdition history in Plone sites. "
                "Default is: all sites in the database.")
 
-p = optparse.OptionParser(usage=usage,
-                          version="%prog " + version,
-                          description=description,
-                          prog="clean_history")
-p.add_option('--portal-types', '-p', action="append",
-             help=('select to cleanup only histories for a kind of portal_type. '
-                   'Default is "all types". Can be called multiple times.'))
-p.add_option('--keep-history', '-k', type="int", metavar="HISTORY_SIZE",
-             help=('Before purging, temporary set the value of "maximum number '
-                   'of versions to keep in the storage" in the '
-                   'portal_purgehistory to this value. '
-                   'Default is: do not change the value. In any case, the '
-                   'original value will be restored.'))
-p.add_option('--verbose', '-v', action="store_true",
-             help="Show verbose output, for every cleaned content's history.")
-
-args = sys.argv[1:]
-options, psite = p.parse_args(args)
-pp_type = options.portal_types
-
 try:
     app
 except NameError:
     raise SystemExit(p.get_usage())
+
 
 def spoofRequest(app):
     """
@@ -99,8 +80,6 @@ def purge_history(id, site, maxNumberOfVersionsToKeep=None, verbose=False):
     transaction.commit()
 
 
-# Enable Faux HTTP request object
-app = spoofRequest(app)
 def main(site_ids, portal_types_to_purge, maxNumberOfVersionsToKeep,
          verbose):
     sites = [(id, site)
@@ -117,6 +96,27 @@ def main(site_ids, portal_types_to_purge, maxNumberOfVersionsToKeep,
 
     print 'End analysis'
 
+p = optparse.OptionParser(usage=usage,
+                          version="%prog " + version,
+                          description=description,
+                          prog="clean_history")
+p.add_option('--portal-types', '-p', action="append",
+             help=('select to cleanup only histories for a kind of portal_type. '
+                   'Default is "all types". Can be called multiple times.'))
+p.add_option('--keep-history', '-k', type="int", metavar="HISTORY_SIZE",
+             help=('Before purging, temporary set the value of "maximum number '
+                   'of versions to keep in the storage" in the '
+                   'portal_purgehistory to this value. '
+                   'Default is: do not change the value. In any case, the '
+                   'original value will be restored.'))
+p.add_option('--verbose', '-v', action="store_true",
+             help="Show verbose output, for every cleaned content's history.")
+
+# Enable Faux HTTP request object
+app = spoofRequest(app)
+
+args = sys.argv[1:]
+options, site_ids = p.parse_args(args)
 
 main(site_ids, options.portal_types, options.keep_history,
      options.verbose)
